@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>當老師遇上 AI Agent｜從錄音到上架的三天</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-primary: #1a1a2e; --bg-card: #16213e; --bg-surface: #0f3460;
+  --accent-cyan: #00d4ff; --accent-purple: #7c3aed; --accent-gold: #f59e0b;
+  --accent-green: #10b981; --accent-red: #ef4444;
+  --text-primary: #f1f5f9; --text-secondary: #94a3b8; --text-muted: #64748b;
+  --border: rgba(0,212,255,0.2);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family:'Noto Sans TC',sans-serif; background:var(--bg-primary); color:var(--text-primary); overflow:hidden; height:100vh; width:100vw; }
+body::before { content:''; position:fixed; inset:0;
+  background-image:linear-gradient(rgba(0,212,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,0.03) 1px,transparent 1px);
+  background-size:50px 50px; pointer-events:none; z-index:0; }
+.slides-wrapper { width:100%; height:100vh; position:relative; overflow:hidden; }
+.slide { position:absolute; width:100%; height:100%; display:flex; align-items:center; justify-content:center;
+  opacity:0; transform:translateX(80px); transition:all .5s cubic-bezier(.4,0,.2,1); pointer-events:none; padding:50px 70px; z-index:1; }
+.slide.active { opacity:1; transform:translateX(0); pointer-events:all; }
+.slide.prev { opacity:0; transform:translateX(-80px); }
+.progress-bar { position:fixed; bottom:0; left:0; height:3px; background:linear-gradient(90deg,var(--accent-cyan),var(--accent-purple));
+  transition:width .4s ease; z-index:100; box-shadow:0 0 10px var(--accent-cyan); }
+.slide-counter { position:fixed; bottom:16px; right:24px; font-size:12px; color:var(--text-muted); z-index:100; font-family:'Space Grotesk',monospace; letter-spacing:.1em; }
+.nav-hint { position:fixed; bottom:16px; left:50%; transform:translateX(-50%); font-size:11px; color:var(--text-muted); z-index:100; }
+.tech-tag { display:inline-block; font-size:11px; letter-spacing:.2em; color:var(--accent-cyan); border:1px solid var(--border);
+  padding:3px 10px; border-radius:4px; margin-bottom:16px; font-family:'Space Grotesk',sans-serif; }
+.deco-line { width:48px; height:3px; background:linear-gradient(90deg,var(--accent-cyan),var(--accent-purple)); border-radius:2px; margin:14px 0; }
+.tech-card { background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:28px; }
+.stat-number { font-family:'Space Grotesk',sans-serif; font-size:52px; font-weight:700; color:var(--accent-cyan); line-height:1; }
+.stat-label { font-size:13px; color:var(--text-secondary); margin-top:6px; }
+.flow-step { display:flex; align-items:flex-start; gap:16px; }
+.flow-num { width:30px; height:30px; background:linear-gradient(135deg,var(--accent-cyan),var(--accent-purple)); border-radius:6px;
+  display:flex; align-items:center; justify-content:center; font-weight:700; flex-shrink:0; font-size:13px; font-family:'Space Grotesk'; }
+</style>
+</head>
+<body>
+
+<div class="slides-wrapper" id="slidesWrapper">
+
+  <!-- 1 封面 -->
+  <div class="slide" style="flex-direction:column;text-align:center;">
+    <div style="position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(0,212,255,0.08) 0%,transparent 70%);top:-100px;right:-100px;pointer-events:none;"></div>
+    <div style="position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(124,58,237,0.08) 0%,transparent 70%);bottom:-50px;left:-50px;pointer-events:none;"></div>
+    <div style="position:relative;z-index:1;">
+      <span class="tech-tag">AI 教育年會 · A 課程設計分場</span>
+      <h1 style="font-size:clamp(36px,5vw,64px);font-weight:900;line-height:1.2;margin-bottom:16px;background:linear-gradient(135deg,#fff 40%,var(--accent-cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">當老師遇上 AI Agent</h1>
+      <div class="deco-line" style="margin:16px auto;"></div>
+      <p style="font-size:18px;color:var(--text-secondary);">從一段錄音，到一個會診斷迷思的數學遊戲 · 三天的真實紀錄</p>
+      <p style="margin-top:24px;font-size:14px;color:var(--text-muted);">國小六年級數學遊戲化學習 · 雞兔同籠</p>
+    </div>
+  </div>
+
+  <!-- 2 痛點與假說 -->
+  <div class="slide" style="align-items:flex-start;justify-content:center;flex-direction:column;">
+    <div style="width:100%;max-width:920px;">
+      <span class="tech-tag">PROBLEM & HYPOTHESIS</span>
+      <h2 style="font-size:38px;font-weight:900;margin-bottom:6px;">痛點與假說</h2>
+      <div class="deco-line"></div>
+      <div class="tech-card" style="margin-top:20px;border-color:rgba(239,68,68,0.35);">
+        <p style="font-size:14px;color:var(--accent-red);font-weight:700;letter-spacing:.1em;margin-bottom:8px;">⬡ 教學現場的真實困難</p>
+        <p style="font-size:20px;line-height:1.7;color:var(--text-primary);">六年級「雞兔同籠」單元迷思多——腳數弄反、不懂 ±2 規律、假設法答反，<br>而且老師<b style="color:var(--accent-gold);">看不見全班「當下」卡在哪裡</b>。</p>
+      </div>
+      <div class="tech-card" style="margin-top:16px;border-color:rgba(16,185,129,0.35);">
+        <p style="font-size:14px;color:var(--accent-green);font-weight:700;letter-spacing:.1em;margin-bottom:8px;">⬡ 我們的假說</p>
+        <p style="font-size:20px;line-height:1.7;color:var(--text-primary);">如果用 AI Agent <b style="color:var(--accent-cyan);">把討論直接變成可上線的遊戲與後臺</b>，<br>就能<b style="color:var(--accent-cyan);">即時看見卡關、老師專注教學專業</b>。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3 章節：Day1 -->
+  <div class="slide" style="flex-direction:column;text-align:center;">
+    <div style="position:absolute;font-size:180px;font-weight:900;opacity:0.04;font-family:'Space Grotesk';color:var(--accent-cyan);user-select:none;">01</div>
+    <div style="position:relative;z-index:1;">
+      <span class="tech-tag">SECTION 01 · DAY 1 夜</span>
+      <h2 style="font-size:56px;font-weight:900;margin:12px 0;background:linear-gradient(135deg,#fff,var(--accent-cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">一支手機，開始錄音</h2>
+      <div class="deco-line" style="margin:16px auto;"></div>
+      <p style="font-size:18px;color:var(--text-secondary);">老師們專心討論問題單，記錄的事交給別人</p>
+    </div>
+  </div>
+
+  <!-- 4 Day1 流程 -->
+  <div class="slide" style="align-items:flex-start;justify-content:center;flex-direction:column;">
+    <div style="width:100%;max-width:920px;">
+      <span class="tech-tag">DAY 1 · 想法彙整與配對</span>
+      <h2 style="font-size:38px;font-weight:900;margin-bottom:6px;">錄音 → 逐字稿 → 問題定義單</h2>
+      <div class="deco-line"></div>
+      <ul style="list-style:none;margin-top:24px;display:flex;flex-direction:column;gap:14px;">
+        <li class="flow-step"><span class="flow-num">1</span><p style="font-size:18px;line-height:1.6;color:var(--text-secondary);padding-top:4px;">🎙️ 用 iPhone 錄音機錄下整場討論——大家<b style="color:var(--text-primary);">盡情丟想法</b>，不必有人分心做紀錄。</p></li>
+        <li class="flow-step"><span class="flow-num">2</span><p style="font-size:18px;line-height:1.6;color:var(--text-secondary);padding-top:4px;">🤖 Agent 消化逐字稿，<b style="color:var(--text-primary);">自動把每個人的想法配對、填進 MVP 問題定義單</b>。</p></li>
+        <li class="flow-step"><span class="flow-num">3</span><p style="font-size:18px;line-height:1.6;color:var(--text-secondary);padding-top:4px;">👀 人做 <b style="color:var(--accent-gold);">double check</b>：檢查 Agent 有沒有填對，給回饋修正。</p></li>
+        <li class="flow-step"><span class="flow-num">4</span><p style="font-size:18px;line-height:1.6;color:var(--text-secondary);padding-top:4px;">🎯 收斂出主題：<b style="color:var(--accent-cyan);">六年級數學「雞兔同籠」遊戲化</b>，定義好對象、限制與小目標。</p></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 5 章節：Day2 -->
+  <div class="slide" style="flex-direction:column;text-align:center;">
+    <div style="position:absolute;font-size:180px;font-weight:900;opacity:0.04;font-family:'Space Grotesk';color:var(--accent-cyan);user-select:none;">02</div>
+    <div style="position:relative;z-index:1;">
+      <span class="tech-tag">SECTION 02 · DAY 2</span>
+      <h2 style="font-size:56px;font-weight:900;margin:12px 0;background:linear-gradient(135deg,#fff,var(--accent-cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">把想法落地</h2>
+      <div class="deco-line" style="margin:16px auto;"></div>
+      <p style="font-size:18px;color:var(--text-secondary);">深化討論，然後——讓 Agent 動手</p>
+    </div>
+  </div>
+
+  <!-- 6 Day2 流程 -->
+  <div class="slide" style="align-items:flex-start;justify-content:center;flex-direction:column;">
+    <div style="width:100%;max-width:920px;">
+      <span class="tech-tag">DAY 2 · 從定義到上線</span>
+      <h2 style="font-size:38px;font-weight:900;margin-bottom:6px;">教冊 PDF 進去，遊戲網站出來</h2>
+      <div class="deco-line"></div>
+      <ul style="list-style:none;margin-top:20px;display:flex;flex-direction:column;gap:12px;">
+        <li class="flow-step"><span class="flow-num">1</span><p style="font-size:17px;line-height:1.6;color:var(--text-secondary);padding-top:4px;">針對問題單內容<b style="color:var(--text-primary);">再次深化討論</b>（一樣全程錄音）。</p></li>
+        <li class="flow-step"><span class="flow-num">2</span><p style="font-size:17px;line-height:1.6;color:var(--text-secondary);padding-top:4px;">丟入「怎樣解題」教冊 PDF：「<b style="color:var(--accent-cyan);">做一個符合我們問題定義單的東西</b>」——Agent 產出四關卡遊戲。</p></li>
+        <li class="flow-step"><span class="flow-num">3</span><p style="font-size:17px;line-height:1.6;color:var(--text-secondary);padding-top:4px;">一句話「<b style="color:var(--accent-cyan);">直接上架</b>」→ GitHub Pages 部署完成，學生開網址就能玩。</p></li>
+        <li class="flow-step"><span class="flow-num">4</span><p style="font-size:17px;line-height:1.6;color:var(--text-secondary);padding-top:4px;">先討論再動手：想看學生卡在哪 → 決定「課堂即時看、班級＋座號、每關就好」→ Agent 加上<b style="color:var(--text-primary);">老師端即時儀表板</b>。</p></li>
+        <li class="flow-step"><span class="flow-num">5</span><p style="font-size:17px;line-height:1.6;color:var(--text-secondary);padding-top:4px;">實測回饋：第 4 關數字太大、加獎狀功能——<b style="color:var(--accent-gold);">截圖回饋，Agent 修正</b>。</p></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 7 對比 -->
+  <div class="slide" style="flex-direction:column;">
+    <div style="width:100%;max-width:960px;">
+      <span class="tech-tag">COMPARISON</span>
+      <h2 style="font-size:36px;font-weight:900;margin-bottom:28px;">組員實測：傳統方法 vs Agent 輔助</h2>
+      <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:24px;align-items:start;">
+        <div class="tech-card" style="border-color:rgba(239,68,68,0.3);">
+          <div style="color:var(--accent-red);font-weight:700;font-size:14px;letter-spacing:.1em;margin-bottom:16px;">⬡ 傳統方法</div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:10px;">
+            <li style="color:var(--text-secondary);font-size:15px;display:flex;gap:8px;"><span style="color:var(--accent-red);">✦</span>要有人分心做會議紀錄</li>
+            <li style="color:var(--text-secondary);font-size:15px;display:flex;gap:8px;"><span style="color:var(--accent-red);">✦</span>表單、簡報、文書自己熬夜做</li>
+            <li style="color:var(--text-secondary);font-size:15px;display:flex;gap:8px;"><span style="color:var(--accent-red);">✦</span>想做互動教材要會寫程式或找廠商</li>
+            <li style="color:var(--text-secondary);font-size:15px;display:flex;gap:8px;"><span style="color:var(--accent-red);">✦</span>重複性流程每次都重走一遍</li>
+          </ul>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;color:var(--text-muted);padding-top:16px;">VS</div>
+        <div class="tech-card" style="border-color:rgba(16,185,129,0.3);">
+          <div style="color:var(--accent-green);font-weight:700;font-size:14px;letter-spacing:.1em;margin-bottom:16px;">⬡ Agent 輔助</div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:10px;">
+            <li style="color:var(--text-secondary);font-size:15px;display:flex;gap:8px;"><span style="color:var(--accent-green);">✦</span>錄音即紀錄，想法自動進表單</li>
+            <li style="color:var(--text-secondary);font-size:15px;display:flex;gap:8px;"><span style="color:var(--accent-green);">✦</span>定義夠清楚，成品直接生出來</li>
+            <li style="color:var(--text-secondary);font-size:15px;display:flex;gap:8px;"><span style="color:var(--accent-green);">✦</span>一句話部署上線＋串資料庫</li>
+            <li style="color:var(--text-secondary);font-size:15px;display:flex;gap:8px;"><span style="color:var(--accent-green);">✦</span>老師專注：提問、判斷、教學專業</li>
+          </ul>
+        </div>
+      </div>
+      <p style="margin-top:20px;font-size:14px;color:var(--text-muted);text-align:center;">※ 人沒有消失——每一步都要 double check，教學專業才是方向盤。</p>
+    </div>
+  </div>
+
+  <!-- 8 數據 -->
+  <div class="slide" style="flex-direction:column;">
+    <div style="width:100%;max-width:960px;">
+      <span class="tech-tag">DATA</span>
+      <h2 style="font-size:36px;font-weight:900;margin-bottom:32px;">兩個晚上，做出了什麼</h2>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;">
+        <div class="tech-card" style="text-align:center;"><div class="stat-number">4</div><div class="stat-label">關卡遊戲<br>觀察→列表→假設法→生活</div></div>
+        <div class="tech-card" style="text-align:center;"><div class="stat-number">3</div><div class="stat-label">大迷思即時診斷<br>腳數對應 · ±2規律 · 假設反了</div></div>
+        <div class="tech-card" style="text-align:center;"><div class="stat-number">5<span style="font-size:26px;">秒</span></div><div class="stat-label">老師端儀表板更新頻率<br>卡關警示 · 迷思排行</div></div>
+        <div class="tech-card" style="text-align:center;"><div class="stat-number">0</div><div class="stat-label">學生帳號需求<br>免登入 · 免安裝</div></div>
+      </div>
+      <div class="tech-card" style="margin-top:20px;">
+        <p style="font-size:16px;color:var(--text-secondary);line-height:1.7;">加碼產出：配套學習單（Word）、Day1–Day3 表單全由 Agent 依錄音填寫、雙向資料庫（Supabase）即時收集全班數據。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9 人機分工 -->
+  <div class="slide" style="flex-direction:column;">
+    <div style="width:100%;max-width:960px;">
+      <span class="tech-tag">HUMAN × AI</span>
+      <h2 style="font-size:36px;font-weight:900;margin-bottom:28px;">人機分工：誰做什麼？</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+        <div class="tech-card" style="border-color:rgba(245,158,11,0.4);">
+          <div style="color:var(--accent-gold);font-weight:700;font-size:15px;letter-spacing:.1em;margin-bottom:14px;">🧑‍🏫 老師（方向盤）</div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:10px;">
+            <li style="color:var(--text-secondary);font-size:16px;display:flex;gap:8px;"><span style="color:var(--accent-gold);">▸</span>提出真實問題、定義清楚需求</li>
+            <li style="color:var(--text-secondary);font-size:16px;display:flex;gap:8px;"><span style="color:var(--accent-gold);">▸</span>教學專業判斷：數字難度、關卡順序、迷思點</li>
+            <li style="color:var(--text-secondary);font-size:16px;display:flex;gap:8px;"><span style="color:var(--accent-gold);">▸</span>double check 每個產出、截圖給回饋</li>
+          </ul>
+        </div>
+        <div class="tech-card" style="border-color:rgba(0,212,255,0.4);">
+          <div style="color:var(--accent-cyan);font-weight:700;font-size:15px;letter-spacing:.1em;margin-bottom:14px;">🤖 Agent（引擎）</div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:10px;">
+            <li style="color:var(--text-secondary);font-size:16px;display:flex;gap:8px;"><span style="color:var(--accent-cyan);">▸</span>逐字稿消化、表單填寫、文書瑣事</li>
+            <li style="color:var(--text-secondary);font-size:16px;display:flex;gap:8px;"><span style="color:var(--accent-cyan);">▸</span>寫程式、做遊戲、串資料庫</li>
+            <li style="color:var(--text-secondary);font-size:16px;display:flex;gap:8px;"><span style="color:var(--accent-cyan);">▸</span>部署上架、除錯、教你它做了什麼</li>
+          </ul>
+        </div>
+      </div>
+      <div class="tech-card" style="margin-top:20px;border-color:rgba(124,58,237,0.4);">
+        <p style="font-size:16px;color:var(--text-secondary);">🧒 學生呢？<b style="color:var(--text-primary);">AI 不代替學生思考</b>——遊戲只給診斷式回饋，觀察、列表、假設、驗算都是學生自己來。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10 成果展示 -->
+  <div class="slide" style="flex-direction:column;">
+    <div style="width:100%;max-width:960px;">
+      <span class="tech-tag">DEMO</span>
+      <h2 style="font-size:36px;font-weight:900;margin-bottom:28px;">現在就掃，直接體驗</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+        <div class="tech-card" style="text-align:center;">
+          <div style="color:var(--accent-green);font-weight:700;font-size:16px;margin-bottom:12px;">🎮 學生端：雞兔同籠大冒險</div>
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://ab0308-del.github.io/chicken-rabbit-game/" style="border-radius:8px;border:4px solid #fff;" alt="學生端 QR">
+          <p style="margin-top:12px;font-size:13px;color:var(--accent-cyan);word-break:break-all;">ab0308-del.github.io/chicken-rabbit-game/</p>
+          <p style="margin-top:6px;font-size:13px;color:var(--text-muted);">輸入班級＋座號（例：60105）就能玩</p>
+        </div>
+        <div class="tech-card" style="text-align:center;">
+          <div style="color:var(--accent-gold);font-weight:700;font-size:16px;margin-bottom:12px;">👩‍🏫 老師端：即時儀表板</div>
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://ab0308-del.github.io/chicken-rabbit-game/teacher.html" style="border-radius:8px;border:4px solid #fff;" alt="老師端 QR">
+          <p style="margin-top:12px;font-size:13px;color:var(--accent-cyan);word-break:break-all;">…/chicken-rabbit-game/teacher.html</p>
+          <p style="margin-top:6px;font-size:13px;color:var(--text-muted);">卡關警示 · 迷思排行 · 每 5 秒更新</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 11 引言 -->
+  <div class="slide" style="flex-direction:column;text-align:center;">
+    <div style="max-width:800px;width:100%;">
+      <div style="font-size:80px;color:var(--accent-cyan);opacity:0.3;line-height:0.8;margin-bottom:8px;">"</div>
+      <p style="font-size:26px;font-weight:700;line-height:1.6;margin-bottom:24px;">很多人說 Agent 很可怕、會取代人的思考。<br>但這三天我們體驗到的是——<br><span style="color:var(--accent-cyan);">它取代的是瑣事，逼出來的反而是我們的專業。</span></p>
+      <div class="deco-line" style="margin:0 auto 20px;"></div>
+      <p style="font-size:15px;color:var(--accent-cyan);">— 共創小組的真實感受（呼應 Day 1 李宏毅教授：Agent 有多厲害）</p>
+    </div>
+  </div>
+
+  <!-- 12 風險與下一步 -->
+  <div class="slide" style="align-items:flex-start;justify-content:center;flex-direction:column;">
+    <div style="width:100%;max-width:920px;">
+      <span class="tech-tag">NEXT STEPS</span>
+      <h2 style="font-size:38px;font-weight:900;margin-bottom:6px;">誠實面對：缺點與下一步</h2>
+      <div class="deco-line"></div>
+      <ul style="list-style:none;margin-top:24px;display:flex;flex-direction:column;gap:14px;">
+        <li class="flow-step"><span class="flow-num" style="background:linear-gradient(135deg,var(--accent-red),var(--accent-gold));">!</span><p style="font-size:18px;line-height:1.6;color:var(--text-secondary);padding-top:4px;">實測發現第 4 關數字太大（30/150 元、180 次）→ <b style="color:var(--text-primary);">已回饋 Agent 調整</b>。</p></li>
+        <li class="flow-step"><span class="flow-num" style="background:linear-gradient(135deg,var(--accent-red),var(--accent-gold));">!</span><p style="font-size:18px;line-height:1.6;color:var(--text-secondary);padding-top:4px;">免費資料庫會休眠（Supabase 一週未用暫停）→ 外部服務要有<b style="color:var(--text-primary);">風險意識與備案</b>。</p></li>
+        <li class="flow-step"><span class="flow-num" style="background:linear-gradient(135deg,var(--accent-red),var(--accent-gold));">!</span><p style="font-size:18px;line-height:1.6;color:var(--text-secondary);padding-top:4px;">別過度依賴：建議<b style="color:var(--accent-cyan);">先自己走過一次脈絡</b>（如用 Gemini 做個簡單網頁），再交給 Agent，思考才不會變淺。</p></li>
+        <li class="flow-step"><span class="flow-num">→</span><p style="font-size:18px;line-height:1.6;color:var(--text-secondary);padding-top:4px;">下一步：學生端加<b style="color:var(--text-primary);">獎狀下載</b>、回校小規模試行、用後臺數據驗證迷思是否真的被釐清。</p></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 13 結尾 -->
+  <div class="slide" style="flex-direction:column;text-align:center;">
+    <div style="position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(0,212,255,0.06) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;"></div>
+    <div style="position:relative;z-index:1;">
+      <div style="font-size:80px;margin-bottom:8px;">🚀</div>
+      <h1 style="font-size:52px;font-weight:900;background:linear-gradient(135deg,#fff,var(--accent-cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:16px;">把瑣事交給工具<br>把時間還給專業</h1>
+      <div class="deco-line" style="margin:16px auto;"></div>
+      <p style="font-size:18px;color:var(--text-secondary);max-width:640px;">這個暑假，找一件你重複做了十年的小事，<br>試著交給 Agent——然後把省下的時間，留給你最擅長的教學。</p>
+      <p style="margin-top:28px;font-size:13px;color:var(--text-muted);">整理自 共創小組 Day1–Day3 錄音逐字稿 · 由 AI Agent 協作完成</p>
+    </div>
+  </div>
+
+</div>
+
+<div class="progress-bar" id="progressBar"></div>
+<div class="slide-counter" id="slideCounter">01 / 13</div>
+<div class="nav-hint">← → 換頁 · 點擊前進</div>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+let current = 0;
+function goTo(n) {
+  slides[current].classList.remove('active');
+  slides[current].classList.add('prev');
+  const prev = current;
+  current = Math.max(0, Math.min(n, slides.length - 1));
+  setTimeout(() => slides[prev].classList.remove('prev'), 500);
+  slides[current].classList.add('active');
+  slides[current].classList.remove('prev');
+  document.getElementById('progressBar').style.width = ((current + 1) / slides.length) * 100 + '%';
+  document.getElementById('slideCounter').textContent =
+    String(current + 1).padStart(2, '0') + ' / ' + String(slides.length).padStart(2, '0');
+}
+slides[0].classList.add('active');
+document.getElementById('progressBar').style.width = (1 / slides.length * 100) + '%';
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') goTo(current + 1);
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') goTo(current - 1);
+});
+document.getElementById('slidesWrapper').addEventListener('click', () => goTo(current + 1));
+</script>
+</body>
+</html>
